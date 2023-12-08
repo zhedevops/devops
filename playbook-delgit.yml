@@ -1,0 +1,7 @@
+- hosts: devops
+
+  tasks:
+    - name: delete git
+      apt:
+        name: git
+        state: absent
