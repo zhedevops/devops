@@ -1,0 +1,67 @@
+- hosts: devops
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      tags: cache
+
+    - name: install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: install Make
+      ansible.builtin.apt:
+        name: make
+        state: present
+      tags: make
+
+    - name: add user arya
+      user:
+        name: arya
+        state: present
+      tags: adduser
+
+    - name: add user sansa
+      user:
+        name: sansa
+        state: present
+      tags: adduser
+
+    - name: add user tirion
+      user:
+        name: tirion
+        state: present
+      tags: adduser
+
+    - name: delete git
+      apt:
+        name: git
+        state: absent
+
+    - name: delete make
+      apt:
+        name: make
+        state: absent
+      tags: make
+
+    - name: deluser user arya
+      user:
+        name: arya
+        state: absent
+      tags: deluser
+
+    - name: deluser user sansa
+      user:
+        name: sansa
+        state: absent
+      tags: deluser
+
+    - name: deluser user tirion
+      user:
+        name: tirion
+        state: absent
+      tags: deluser
