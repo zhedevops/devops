@@ -52,16 +52,19 @@
       user:
         name: arya
         state: absent
+        remove: yes
       tags: deluser
 
     - name: deluser user sansa
       user:
         name: sansa
         state: absent
+        remove: yes
       tags: deluser
 
     - name: deluser user tirion
       user:
         name: tirion
         state: absent
+        remove: yes
       tags: deluser

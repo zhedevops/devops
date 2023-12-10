@@ -1,13 +1,18 @@
 - hosts: devops
-  gather_facts: no
+#  если включить, что ansible_os_family будет неопределена
+#  gather_facts: no
+  vars:
+    delgit: false
   tasks:
     - name: install git
       apt:
         name: git
         state: present
         update_cache: yes
+      when: ansible_os_family == "Debian" and delgit
 
     - name: delete git
       apt:
         name: git
         state: absent
+      when: delgit

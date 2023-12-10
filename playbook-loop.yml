@@ -1,0 +1,90 @@
+# установить гит и пользователей
+# /home/kosm/.local/bin/ansible-playbook playbook-loop.yml -i inventory.ini -u root --skip-tags delete_git_users
+# удалить гит и пользователей
+# /home/kosm/.local/bin/ansible-playbook playbook-loop.yml -i inventory.ini -u root -t delete_git_users
+- hosts: devops
+  become: yes
+  vars:
+    users:
+      - jaime
+      - sansa
+      - robert
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      tags: cache
+
+    - name: install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: add users
+      user:
+        name: "{{item}}"
+        state: present
+        password: "{{ item | password_hash('sha512') }}"
+      loop: "{{users}}"
+
+    - name: make directory files
+      ansible.builtin.file:
+        path: files
+        state: directory
+
+    - name: Creating a file .gitconfig with content for each user
+      copy:
+        dest: "/home/{{item}}/.gitconfig"
+        content: |
+            [alias]
+              co = checkout
+              ci = commit
+              st = status
+              br = branch
+              hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+              type = cat-file -t
+              dump = cat-file -p
+              commend = commit --amend
+            [core]
+              excludesFile = ~/.gitignore_global
+              editor = vim
+            [user]
+              email = {{item}}@test.com
+              name = {{item}}
+            [credential]
+              helper = store
+      loop: "{{users}}"
+
+    - name: copy pub key to files
+      ansible.builtin.copy:
+        src: /home/kosm/.ssh/hexlet_devops.pub
+        dest: files/hexlet_devops.pub
+
+    - name: make ssh directory for each user
+      ansible.builtin.file:
+        path: "/home/{{item}}/.ssh/authorized_keys"
+        state: directory
+      loop: "{{users}}"
+
+    - name: copy pub key to users
+      ansible.builtin.copy:
+        src: files/hexlet_devops.pub
+        dest: "/home/{{item}}/.ssh/authorized_keys"
+        remote_src: yes
+      loop: "{{users}}"
+
+    - name: delete git
+      apt:
+        name: git
+        state: absent
+      tags: delete_git_users
+
+    - name: delete users
+      user:
+        name: "{{item}}"
+        state: absent
+        remove: yes
+      loop: "{{users}}"
+      tags: delete_git_users
+
