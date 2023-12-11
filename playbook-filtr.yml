@@ -1,0 +1,35 @@
+- hosts: devops
+#  если включить, что ansible_os_family будет неопределена
+#  gather_facts: no
+  become: yes
+  vars:
+    descr: This is server {{ansible_nodename}}!
+    root_dir: /usr/share/nginx/html
+  tasks:
+    - name: make directory files
+      ansible.builtin.file:
+        path: templates
+        state: directory
+
+    - name: Creating a file index.html with content
+      copy:
+        dest: templates/index.html.j2
+        content: |
+            <html lang="en"><head>
+              <meta charset="UTF-8">
+              <meta http-equiv="X-UA-Compatible" content="IE=edge">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Hello World!</title>
+            </head>
+            <body>
+              <h1>Hello World!</h1>
+              <h2>{{ descr | upper}}</h2> <!-- Эта строка была приведена в верхний регистр с помощью фильтра -->
+              <small>Deployed at: {{ '%Y-%m-%d %H:%M:%S' | strftime(ansible_date_time.epoch) }}</small> <!-- Локализованная дата -->
+            </body>
+            </html>
+
+    - name: template html
+      ansible.builtin.copy:
+        src: templates/index.html.j2
+        dest: "{{root_dir}}/index.html"
+        remote_src: yes
