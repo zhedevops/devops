@@ -61,17 +61,11 @@
         src: /home/kosm/.ssh/hexlet_devops.pub
         dest: files/hexlet_devops.pub
 
-    - name: make ssh directory for each user
-      ansible.builtin.file:
-        path: "/home/{{item}}/.ssh/authorized_keys"
-        state: directory
-      loop: "{{users}}"
-
-    - name: copy pub key to users
-      ansible.builtin.copy:
-        src: files/hexlet_devops.pub
-        dest: "/home/{{item}}/.ssh/authorized_keys"
-        remote_src: yes
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: "{{item}}"
+        state: present
+        key: "{{ lookup('file', '/home/kosm/.ssh/hexlet_devops.pub') }}"
       loop: "{{users}}"
 
     - name: delete git

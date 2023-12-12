@@ -1,0 +1,23 @@
+- hosts: devops
+  become: yes
+  pre_tasks: # Выполняются до ролей
+    - name: remove nginx
+      apt:
+        name: nginx
+        state: absent
+
+    - name: install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+  roles:
+    - role: nginxinc.nginx
+    - role: cowops.debian-sphinxsearch
+    - role: git_conf
+  tasks:
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: vasya
+        state: present
+        key: "{{ lookup('file', '/home/kosm/.ssh/hexlet_devops.pub') }}"
