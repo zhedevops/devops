@@ -1,0 +1,8 @@
+- hosts: devops
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: delete cowsay
+      apt:
+        name: cowsay
+        state: absent

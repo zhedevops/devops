@@ -1,0 +1,30 @@
+- copy:
+    dest: files/index.html
+    content: |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Hello World!</title>
+        </head>
+        <body>
+          <h1>Hello World!</h1>
+          <h2>This is server {{ server_name }}!</h2>
+        </body>
+        </html>
+
+- copy:
+    dest: files/nginx.conf
+    content: |
+        events {
+
+        }
+
+        http {
+          server {
+            listen 80 default_server;
+            listen {{nginx_port}} default_server;
+          }
+        }

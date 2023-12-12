@@ -1,6 +1,6 @@
 - hosts: devops
   vars:
-    nginx_port: 8080
+    nginx_port: 8090
     root_dir: /usr/share/nginx/html
   become: yes
   tasks:
@@ -9,38 +9,9 @@
         path: files
         state: directory
 
-    - name: Creating a file index.html with content
-      copy:
-        dest: files/index.html
-        content: |
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Hello World!</title>
-          </head>
-          <body>
-            <h1>Hello World!</h1>
-            <h2>This is server {{ server_name }}!</h2>
-          </body>
-          </html>
-
-    - name: Creating a file nginx.conf with content
-      copy:
-        dest: files/nginx.conf
-        content: |
-          events {
-
-          }
-
-          http {
-            server {
-              listen 80 default_server;
-              listen {{nginx_port}} default_server;
-            }
-          }
+    - name: create-file-content
+      ansible.builtin.import_tasks:
+        file: create-file-content.yml
 
     - name: change permissions
       file:
