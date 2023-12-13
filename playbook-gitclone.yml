@@ -1,0 +1,71 @@
+- hosts: devops
+  become: yes
+#  gather_facts: no
+  vars:
+    db_name: hexlet
+    db_user: hexlet
+  tasks:
+    - name: Print db_pass
+      ansible.builtin.debug:
+        msg: "{{ db_pass }}"
+      tags: debug
+
+    - name: install python3
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: install psycopg2
+      pip:
+        name: psycopg2-binary
+        state: present
+
+    - name: install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: Install PostgreSQL
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - postgresql
+        - postgresql-contrib
+      become: yes
+
+    - name: Ensure the PostgreSQL service is running
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: github DevOps example app
+      ansible.builtin.git:
+        repo: https://github.com/hexlet-components/devops-example-app.git
+        dest: ~/devops-example-app/
+
+    - name: new db user
+      community.postgresql.postgresql_user:
+#        db: "{{ db_name }}"
+        name: "{{ db_user }}"
+        password: "{{ db_pass }}"
+      tags: adddbuser
+
+    - name: new DB
+      community.postgresql.postgresql_db:
+        name: "{{ db_name }}"
+      tags: adddb
+
+    - name: run scripts
+      community.postgresql.postgresql_script:
+        db: "{{ db_name }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+        path: /var/lib/pgsql/test.sql
+        named_args:
+          id_val: 1
+          story_val: test
